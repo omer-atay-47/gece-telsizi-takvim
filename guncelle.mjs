@@ -27,7 +27,7 @@ const items = EP.map(([id, ad, q, a, b]) => {
   return { date, time: alt ? "22:30" : "20:30", series: alt ? "gecealt" : "gece", title: `Bölüm ${no}: ${ad}${alt ? " (yedek)" : ""}`, caption, file: `bolum${id}.mp4`, meta: !alt };
 });
 // Her videodan 5 dakika sonra o bölümü tanıtan 15 saniyelik hikaye (Meta'da ayrıca planlanır).
-const hikayeler = items.map((i) => ({
+const hikayeler = items.filter((i) => i.meta).map((i) => ({
   date: i.date, time: i.time.replace(/:30$/, ":35"), series: "hikaye", title: `Hikaye • ${i.title}`,
   note: `Saat ${i.time} videosundan 5 dakika sonra paylaşılan 15 saniyelik tanıtım hikayesi.`, meta: true,
 }));
