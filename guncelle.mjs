@@ -25,5 +25,11 @@ const items = EP.map(([id, ad, q, a, b]) => {
   const caption = `GECE TELSİZİ • Bölüm ${no}: ${ad}\n\n${q}\n\nA) ${a}\nB) ${b}\n\nKararı yorumlara yaz, çoğunluk ne derse hikâye oradan devam eder.\n\n${TAG}`;
   return { date, time: alt ? "22:30" : "20:30", series: alt ? "gecealt" : "gece", title: `Bölüm ${no}: ${ad}`, caption, file: `bolum${id}.mp4`, meta: true };
 });
-fs.writeFileSync(new URL("./plan.json", import.meta.url), JSON.stringify({ updated: new Date().toISOString(), account: "gece telsizi", items }, null, 1));
-console.log(items.length, "gönderi, son gün", items.at(-1).date);
+// Her videodan 5 dakika sonra o bölümü tanıtan 15 saniyelik hikaye (Meta'da ayrıca planlanır).
+const hikayeler = items.map((i) => ({
+  date: i.date, time: i.time.replace(/:30$/, ":35"), series: "hikaye", title: `Hikaye • ${i.title}`,
+  note: `Saat ${i.time} videosundan 5 dakika sonra paylaşılan 15 saniyelik tanıtım hikayesi.`, meta: true,
+}));
+const hepsi = [...items, ...hikayeler].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+fs.writeFileSync(new URL("./plan.json", import.meta.url), JSON.stringify({ updated: new Date().toISOString(), account: "gece telsizi", items: hepsi }, null, 1));
+console.log(items.length, "video,", hikayeler.length, "hikaye, son gün", hepsi.at(-1).date);

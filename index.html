@@ -9,7 +9,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-:root{--bg:#0b0b0d;--card:#151518;--line:#26262b;--fg:#f2f2f4;--mut:#9a9aa3;--gece:#ff6b3d;--gecealt:#c084fc;--acc:#ff6b3d}
+:root{--bg:#0b0b0d;--card:#151518;--line:#26262b;--fg:#f2f2f4;--mut:#9a9aa3;--gece:#ff6b3d;--gecealt:#c084fc;--hikaye:#58d4e4;--acc:#ff6b3d}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) max(14px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(14px,env(safe-area-inset-left))}
 .wrap{max-width:1000px;margin:0 auto;padding:16px 0 40px}
@@ -69,12 +69,13 @@ body.liste .grid{display:none}body.liste .list{display:block}
   <div class="leg">
     <span style="--c:var(--gece)"><i></i>Gece Telsizi 20:30</span>
     <span style="--c:var(--gecealt)"><i></i>Alternatif son 22:30</span>
+    <span style="--c:var(--hikaye)"><i></i>Hikaye (videodan 5 dk sonra)</span>
     <span>┄ Kesikli çizgi: üretildi, Planlanmadı</span>
   </div>
 </div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <script>
-const ADLAR={gece:"Gece Telsizi",gecealt:"Gece Telsizi (alternatif)"};
+const ADLAR={gece:"Gece Telsizi",gecealt:"Gece Telsizi (alternatif)",hikaye:"Instagram hikayesi"};
 const AYLAR=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const GUN=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 const $=s=>document.querySelector(s);
@@ -86,13 +87,13 @@ const pad=n=>String(n).padStart(2,"0");
 const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 function chip(i){return `<button class="chip ${done(i)?"done":""} ${i.meta?"":"nometa"}" style="--c:var(--${i.series})" data-k="${items.indexOf(i)}"><b>${i.time}</b>${esc(short(i.title))}</button>`}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const short=t=>t.replace(/^TAHMİN ET! /,"");
+const short=t=>t.replace(/^TAHMİN ET! /,"").replace(/^Hikaye • Bölüm (\w+).*$/,"Hikaye $1");
 function render(){
   $("#ay").textContent=AYLAR[cur.getMonth()]+" "+cur.getFullYear();
   const first=new Date(cur.getFullYear(),cur.getMonth(),1),off=(first.getDay()+6)%7;
   const start=new Date(first);start.setDate(1-off);
   const today=key(new Date());let h=GUN.map(g=>`<div class="dow">${g}</div>`).join("");
-  for(let n=0;n<42;n++){const d=new Date(start);d.setDate(start.getDate()+n);if(n>=35&&d.getMonth()!==cur.getMonth())break;
+  for(let n=0;n<42;n++){const d=new Date(start);d.setDate(start.getDate()+n);if(n>=35&&n%7===0&&d.getMonth()!==cur.getMonth())break;
     const k=key(d),di=items.filter(i=>i.date===k);
     h+=`<div class="day ${d.getMonth()!==cur.getMonth()?"out":""} ${k===today?"today":""}"><span class="n">${d.getDate()}</span>${di.map(chip).join("")}</div>`}
   $("#grid").innerHTML=h;
@@ -104,7 +105,7 @@ function render(){
 }
 function kap(){$("#modal").classList.remove("open");$("#sheet").innerHTML=""}
 function ac(k){const i=items[k];
-  $("#sheet").innerHTML=`<div class="sub" style="color:var(--${i.series})">${ADLAR[i.series]} • ${i.date.split("-").reverse().join(".")} ${i.time} • ${dur(i)}</div><h3>${esc(i.title)}</h3>${i.file?`<video src="videolar/${i.file}" controls playsinline preload="metadata" style="width:100%;max-height:55vh;border-radius:10px;background:#000;margin-top:10px"></video>`:""}${i.caption?`<pre id="cp">${esc(i.caption)}</pre>`:'<div class="sub" style="margin:12px 0">Açıklama kayıtlı değil.</div>'}<div class="row">${i.caption?'<button id="kop">Açıklamayı kopyala</button>':""}<button id="kapa">Kapat</button></div>`;
+  $("#sheet").innerHTML=`<div class="sub" style="color:var(--${i.series})">${ADLAR[i.series]} • ${i.date.split("-").reverse().join(".")} ${i.time} • ${dur(i)}</div><h3>${esc(i.title)}</h3>${i.file?`<video src="videolar/${i.file}" controls playsinline preload="metadata" style="width:100%;max-height:55vh;border-radius:10px;background:#000;margin-top:10px"></video>`:""}${i.caption?`<pre id="cp">${esc(i.caption)}</pre>`:`<div class="sub" style="margin:12px 0">${esc(i.note||"Açıklama kayıtlı değil.")}</div>`}<div class="row">${i.caption?'<button id="kop">Açıklamayı kopyala</button>':""}<button id="kapa">Kapat</button></div>`;
   $("#modal").classList.add("open");
   $("#kapa").onclick=()=>kap();
   const b=$("#kop");if(b)b.onclick=async()=>{try{await navigator.clipboard.writeText(i.caption);b.textContent="Kopyalandı"}catch{const r=document.createRange();r.selectNodeContents($("#cp"));getSelection().removeAllRanges();getSelection().addRange(r);b.textContent="Seçildi, kopyala"}}}
