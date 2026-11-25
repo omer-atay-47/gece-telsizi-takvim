@@ -23,7 +23,8 @@ const items = EP.map(([id, ad, q, a, b]) => {
   const date = tarih(gun);
   const no = id.toUpperCase();
   const caption = `GECE TELSİZİ • Bölüm ${no}: ${ad}\n\n${q}\n\nA) ${a}\nB) ${b}\n\nKararı yorumlara yaz, çoğunluk ne derse hikâye oradan devam eder.\n\n${TAG}`;
-  return { date, time: alt ? "22:30" : "20:30", series: alt ? "gecealt" : "gece", title: `Bölüm ${no}: ${ad}`, caption, file: `bolum${id}.mp4`, meta: true };
+  // 2B yedek: planlanmaz; 1. bölümün oylamasında B kazanırsa 2A'nın yerine paylaşılır.
+  return { date, time: alt ? "22:30" : "20:30", series: alt ? "gecealt" : "gece", title: `Bölüm ${no}: ${ad}${alt ? " (yedek)" : ""}`, caption, file: `bolum${id}.mp4`, meta: !alt };
 });
 // Her videodan 5 dakika sonra o bölümü tanıtan 15 saniyelik hikaye (Meta'da ayrıca planlanır).
 const hikayeler = items.map((i) => ({

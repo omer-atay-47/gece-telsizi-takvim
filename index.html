@@ -68,7 +68,7 @@ body.liste .grid{display:none}body.liste .list{display:block}
   <div class="list" id="list"></div>
   <div class="leg">
     <span style="--c:var(--gece)"><i></i>Gece Telsizi 20:30</span>
-    <span style="--c:var(--gecealt)"><i></i>Alternatif son 22:30</span>
+    <span style="--c:var(--gecealt)"><i></i>Yedek (oylamada B kazanırsa)</span>
     <span style="--c:var(--hikaye)"><i></i>Hikaye (videodan 5 dk sonra)</span>
     <span>┄ Kesikli çizgi: üretildi, Planlanmadı</span>
   </div>
@@ -82,7 +82,7 @@ const $=s=>document.querySelector(s);
 let items=[],cur=new Date();cur.setDate(1);
 const dt=i=>new Date(i.date+"T"+i.time+":00+03:00");
 const done=i=>dt(i)<new Date();
-const dur=i=>done(i)?"Yayında":(i.meta?"Otomatik planlı":"Planlanmadı");
+const dur=i=>!i.meta?"Planlanmadı":(done(i)?"Yayında":"Otomatik planlı");
 const pad=n=>String(n).padStart(2,"0");
 const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 function chip(i){return `<button class="chip ${done(i)?"done":""} ${i.meta?"":"nometa"}" style="--c:var(--${i.series})" data-k="${items.indexOf(i)}"><b>${i.time}</b>${esc(short(i.title))}</button>`}
