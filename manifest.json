@@ -1,6 +1,6 @@
 {
-  "name": "Gece Telsizi Takvim",
-  "short_name": "Gece Takvim",
+  "name": "Yarından Arayan Takvim",
+  "short_name": "Yarından Arayan",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

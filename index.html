@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0d">
-<title>Gece Telsizi Takvim</title>
+<title>Yarından Arayan Takvim</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-:root{--bg:#0b0b0d;--card:#151518;--line:#26262b;--fg:#f2f2f4;--mut:#9a9aa3;--gece:#ff6b3d;--gecealt:#c084fc;--hikaye:#58d4e4;--acc:#ff6b3d}
+:root{--bg:#0b0b0d;--card:#151518;--line:#26262b;--fg:#f2f2f4;--mut:#9a9aa3;--bolum:#ff5a4a;--hikaye:#58d4e4;--acc:#ff5a4a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) max(14px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(14px,env(safe-area-inset-left))}
 .wrap{max-width:1000px;margin:0 auto;padding:16px 0 40px}
@@ -57,7 +57,7 @@ body.liste .grid{display:none}body.liste .list{display:block}
 <div class="wrap">
   <header>
     <img src="icon-192.png" alt="">
-    <div><h1>Gece Telsizi Takvim</h1><div class="sub" id="sub">Gece Telsizi • otomatik paylaşım planı</div></div>
+    <div><h1>Yarından Arayan Takvim</h1><div class="sub" id="sub">Yarından Arayan • otomatik paylaşım planı</div></div>
     <span class="sp"></span>
     <span class="vtog"><button id="vg" class="on">Takvim</button> <button id="vl">Liste</button></span>
   </header>
@@ -67,15 +67,14 @@ body.liste .grid{display:none}body.liste .list{display:block}
   <div class="grid" id="grid"></div>
   <div class="list" id="list"></div>
   <div class="leg">
-    <span style="--c:var(--gece)"><i></i>Gece Telsizi 20:30</span>
-    <span style="--c:var(--gecealt)"><i></i>Yedek (oylamada B kazanırsa)</span>
+    <span style="--c:var(--bolum)"><i></i>Bölüm 20:30</span>
     <span style="--c:var(--hikaye)"><i></i>Hikaye (videodan 5 dk sonra)</span>
     <span>┄ Kesikli çizgi: üretildi, Planlanmadı</span>
   </div>
 </div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <script>
-const ADLAR={gece:"Gece Telsizi",gecealt:"Gece Telsizi (alternatif)",hikaye:"Instagram hikayesi"};
+const ADLAR={bolum:"Yarından Arayan",hikaye:"Instagram hikayesi"};
 const AYLAR=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const GUN=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 const $=s=>document.querySelector(s);
@@ -105,7 +104,7 @@ function render(){
 }
 function kap(){$("#modal").classList.remove("open");$("#sheet").innerHTML=""}
 function ac(k){const i=items[k];
-  $("#sheet").innerHTML=`<div class="sub" style="color:var(--${i.series})">${ADLAR[i.series]} • ${i.date.split("-").reverse().join(".")} ${i.time} • ${dur(i)}</div><h3>${esc(i.title)}</h3>${i.file?`<video src="videolar/${i.file}" controls playsinline preload="metadata" style="width:100%;max-height:55vh;border-radius:10px;background:#000;margin-top:10px"></video>`:""}${i.caption?`<pre id="cp">${esc(i.caption)}</pre>`:`<div class="sub" style="margin:12px 0">${esc(i.note||"Açıklama kayıtlı değil.")}</div>`}<div class="row">${i.caption?'<button id="kop">Açıklamayı kopyala</button>':""}<button id="kapa">Kapat</button></div>`;
+  $("#sheet").innerHTML=`<div class="sub" style="color:var(--${i.series})">${ADLAR[i.series]} • ${i.date.split("-").reverse().join(".")} ${i.time} • ${dur(i)}</div><h3>${esc(i.title)}</h3>${i.sonuc?`<div class="sub">Oylama: ${esc(i.sonuc)}</div>`:""}${i.file?`<video src="videolar/${i.file}" controls playsinline preload="metadata" style="width:100%;max-height:55vh;border-radius:10px;background:#000;margin-top:10px"></video>`:""}${i.caption?`<pre id="cp">${esc(i.caption)}</pre>`:`<div class="sub" style="margin:12px 0">${esc(i.note||"Açıklama kayıtlı değil.")}</div>`}<div class="row">${i.caption?'<button id="kop">Açıklamayı kopyala</button>':""}<button id="kapa">Kapat</button></div>`;
   $("#modal").classList.add("open");
   $("#kapa").onclick=()=>kap();
   const b=$("#kop");if(b)b.onclick=async()=>{try{await navigator.clipboard.writeText(i.caption);b.textContent="Kopyalandı"}catch{const r=document.createRange();r.selectNodeContents($("#cp"));getSelection().removeAllRanges();getSelection().addRange(r);b.textContent="Seçildi, kopyala"}}}
@@ -116,7 +115,7 @@ $("#bugun").onclick=()=>{cur=new Date();cur.setDate(1);render()};
 $("#vg").onclick=()=>{document.body.classList.remove("liste");$("#vg").classList.add("on");$("#vl").classList.remove("on")};
 $("#vl").onclick=()=>{document.body.classList.add("liste");$("#vl").classList.add("on");$("#vg").classList.remove("on")};
 fetch("plan.json?"+Date.now()).then(r=>r.json()).then(p=>{items=p.items;
-  const u=new Date(p.updated);$("#sub").textContent="Gece Telsizi • otomatik paylaşım • güncelleme: "+u.toLocaleDateString("tr-TR");
+  const u=new Date(p.updated);$("#sub").textContent="Yarından Arayan • yorumlara göre ilerler • güncelleme: "+u.toLocaleDateString("tr-TR");
   const ilk=items.map(dt).find(d=>d>new Date());if(ilk&&!items.some(i=>i.date.startsWith(key(new Date()).slice(0,7)))){cur=new Date(ilk);cur.setDate(1)}
   render()}).catch(()=>{$("#list").style.display="block";$("#list").textContent="Plan yüklenemedi."});
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
