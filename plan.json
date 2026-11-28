@@ -1,5 +1,25 @@
 {
- "updated": "2026-11-28T14:33:56Z",
- "account": "gece telsizi",
- "items": []
+ "updated": "2026-11-28T16:09:17.259Z",
+ "account": "yorumlar.yonetiyor",
+ "items": [
+  {
+   "date": "2026-11-28",
+   "time": "20:30",
+   "series": "bolum",
+   "title": "Bölüm 1: Kapıyı Açma",
+   "caption": "YARINDAN ARAYAN • Bölüm 1: Kapıyı Açma\n\nGece 02:47'de telefonum çaldı. Arayan numara benimkiydi.\n\nSence kapıyı açayım mı, yoksa telefondaki sesi mi dinleyeyim?\n\nA) Kapıyı aç\nB) Telefondaki sesi dinle\n\nYoruma A ya da B yaz, çoğunluk ne derse hikâye oradan devam eder.\n\n#hikaye #korku #gerilim #gizem #yarindanarayan #reels #yorumlarayaz #seri",
+   "file": "yarindan-bolum1.mp4",
+   "sonuc": "",
+   "meta": false
+  },
+  {
+   "date": "2026-11-28",
+   "time": "20:35",
+   "series": "hikaye",
+   "title": "Hikaye • Bölüm 1: Kapıyı Açma",
+   "note": "Videodan 5 dakika sonra paylaşılan 15 saniyelik tanıtım hikayesi.",
+   "file": "yarindan-hikaye1.mp4",
+   "meta": false
+  }
+ ]
 }

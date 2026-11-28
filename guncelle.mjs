@@ -1,36 +1,15 @@
-// plan.json'u üretir. Kullanım: node guncelle.mjs, sonra git add -A; git commit; git push
-// Seri: Gece Telsizi, günde 1 bölüm 20:30; 2B alternatif son olarak 2A ile aynı gün 22:30.
+// bolumler.json'dan plan.json'u üretir. Kullanım: node guncelle.mjs, sonra git add (profil.png hariç); commit; push
+// Seri: Yarından Arayan. Günde en fazla 1 bölüm: reel 20:30, tanıtım hikayesi 20:35.
+// Her bölüm: no, ad, tarih, a, b, caption, planlandi (Meta'da doğrulandıysa true), link, sonuc (oylama özeti).
+// Videolar: videolar/yarindan-bolum<no>.mp4 ve videolar/yarindan-hikaye<no>.mp4
 import fs from "node:fs";
-const BASLA = "2026-11-25";
-const TAG = "#hikaye #korku #gizem #bebektelsizi #reels #yorumlarayaz #seri #gecetelsizi";
-const EP = [
-  ["1", "Fısıltı", "Polisi arayayım mı, yoksa yarın gece telsizin başında mı bekleyeyim?", "Polisi ara", "Bekle"],
-  ["2a", "Polisi ara", "Polise güvenmeli miyim, yoksa kendim mi araştırmalıyım?", "Polise güven", "Kendin araştır"],
-  ["2b", "Bekle", "Kutuyu açayım mı, yoksa eşimi mi uyandırayım?", "Kutuyu aç", "Eşini uyandır"],
-  ["3", "Sabah", "Duvara ben de vurayım mı, yoksa eşime kaydı mı göstereyim?", "Duvara vur", "Kaydı göster"],
-  ["4", "Tıkırtı", "Fotoğrafı eşime göstereyim mi, yoksa komşuya mı götüreyim?", "Eşine göster", "Komşuya götür"],
-  ["5", "Hatice Teyze", "Hatice Teyze'ye güvenmeli miyim, yoksa her şeyden şüphe mi etmeliyim?", "Güven", "Şüphe et"],
-  ["6", "Aynı İsim", "Eşimin peşinden gideyim mi, yoksa telsizi mi dinleyeyim?", "Eşinin peşinden git", "Telsizi dinle"],
-  ["7", "Eşimin Sırrı", "Emlakçının ofisine gideyim mi, yoksa zarfı mı açayım?", "Ofise git", "Zarfı aç"],
-  ["8", "Duvarın Arkası", "Kapıyı hemen açayım mı, yoksa önce polise mi haber vereyim?", "Hemen aç", "Polise haber ver"],
-  ["9", "Gizli Oda", "Selma'ya ne söylemeliyim: seni çıkaracağım mı, yoksa kızın nerede mi?", "Seni çıkaracağım", "Kızın nerede?"],
-];
-const tarih = (n) => { const d = new Date(BASLA + "T12:00:00+03:00"); d.setDate(d.getDate() + n); return d.toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" }); };
-let gun = 0;
-const items = EP.map(([id, ad, q, a, b]) => {
-  const alt = id === "2b";
-  if (!alt && id !== "1") gun++;
-  const date = tarih(gun);
-  const no = id.toUpperCase();
-  const caption = `GECE TELSİZİ • Bölüm ${no}: ${ad}\n\n${q}\n\nA) ${a}\nB) ${b}\n\nKararı yorumlara yaz, çoğunluk ne derse hikâye oradan devam eder.\n\n${TAG}`;
-  // 2B yedek: planlanmaz; 1. bölümün oylamasında B kazanırsa 2A'nın yerine paylaşılır.
-  return { date, time: alt ? "22:30" : "20:30", series: alt ? "gecealt" : "gece", title: `Bölüm ${no}: ${ad}${alt ? " (yedek)" : ""}`, caption, file: `bolum${id}.mp4`, meta: !alt };
-});
-// Her videodan 5 dakika sonra o bölümü tanıtan 15 saniyelik hikaye (Meta'da ayrıca planlanır).
-const hikayeler = items.filter((i) => i.meta).map((i) => ({
-  date: i.date, time: i.time.replace(/:30$/, ":35"), series: "hikaye", title: `Hikaye • ${i.title}`,
-  note: `Saat ${i.time} videosundan 5 dakika sonra paylaşılan 15 saniyelik tanıtım hikayesi.`, meta: true,
-}));
-const hepsi = [...items, ...hikayeler].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-fs.writeFileSync(new URL("./plan.json", import.meta.url), JSON.stringify({ updated: new Date().toISOString(), account: "gece telsizi", items: hepsi }, null, 1));
-console.log(items.length, "video,", hikayeler.length, "hikaye, son gün", hepsi.at(-1).date);
+const bolumler = JSON.parse(fs.readFileSync(new URL("./bolumler.json", import.meta.url), "utf8"));
+const gunler = bolumler.map((x) => x.tarih);
+if (new Set(gunler).size !== gunler.length) throw new Error("Aynı güne iki bölüm konmuş.");
+const items = bolumler.flatMap((x) => [
+  { date: x.tarih, time: "20:30", series: "bolum", title: `Bölüm ${x.no}: ${x.ad}`, caption: x.caption, file: `yarindan-bolum${x.no}.mp4`, sonuc: x.sonuc, meta: x.planlandi },
+  { date: x.tarih, time: "20:35", series: "hikaye", title: `Hikaye • Bölüm ${x.no}: ${x.ad}`, note: "Videodan 5 dakika sonra paylaşılan 15 saniyelik tanıtım hikayesi.", file: `yarindan-hikaye${x.no}.mp4`, meta: x.planlandi },
+]);
+items.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+fs.writeFileSync(new URL("./plan.json", import.meta.url), JSON.stringify({ updated: new Date().toISOString(), account: "yorumlar.yonetiyor", items }, null, 1));
+console.log(bolumler.length, "bölüm,", items.length, "kayıt");
